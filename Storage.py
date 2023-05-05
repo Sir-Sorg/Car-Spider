@@ -37,4 +37,6 @@ def save(cars: list):
         cursor.execute(query, value)
         connection.commit()
         counter += 1
+
+    cursor.close()
     print(f'{counter} items saved in database')
