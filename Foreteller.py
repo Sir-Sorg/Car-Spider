@@ -1,7 +1,6 @@
 import sqlite3
 import numpy as np
 from sklearn.neighbors import KNeighborsRegressor
-from sklearn.preprocessing import StandardScaler
 from sklearn import preprocessing
 
 connection = sqlite3.connect("cars_db.sqlite")
@@ -9,7 +8,7 @@ cursor = connection.cursor()
 
 
 def standardization(model):
-    scaler = StandardScaler()
+    scaler = preprocessing.StandardScaler()
     scaler.fit(model)
     STD_data = scaler.transform(model)
     return STD_data
@@ -30,30 +29,37 @@ def read_data():
     dataSet = list(cursor.execute(query))
     dataSet = list(filter(lambda x: type(x[2]) == int, dataSet))
     dataSet = np.array(dataSet)
+    
     # remove ID Column of data
     dataSet = dataSet[:, 1:]
-    # convert numbers to int
+
     return dataSet
 
 
-def predict():
+def predict(userInput:list):
+    # read data from Database and splite feture and lbale
     dataSet = read_data()
     X, Y = dataSet[:, :-1], dataSet[:, -1]
-    userInput = [6, 63000,     0,     1,  1399,     0,     0]
 
+    # add user input into data and numberize & standarding its value
     X = np.vstack([X, userInput])
     X = dummy_variables(X)
     X = standardization(X)
     Y = Y.astype(int)
 
+    # Splite user input from data set
     userInput = [X[-1, :]]
     X = X[:-1, :]
-    
+
+    # Train knn regresion model
     neigh = KNeighborsRegressor(n_neighbors=5)
     neigh.fit(X, Y)
 
+    # predict price of the car
     y_hat = neigh.predict(userInput)
     y_hat = y_hat.astype(int)[0]
     y_hat = (y_hat // 100000)*100000
 
+    # return the value of price
     print(f'Best Value for your car is "{y_hat}" toman')
+    return y_hat
