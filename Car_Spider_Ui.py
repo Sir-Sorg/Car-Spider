@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
+import Car_Price_Predict
 
 
 class Ui_MainWindow(object):
@@ -2479,7 +2480,7 @@ class Ui_MainWindow(object):
         self.radioButton_7.setText(_translate("MainWindow", "دوگانه سوز"))
         self.radioButton_8.setText(_translate("MainWindow", "بنزینی"))
         # Button Function ->
-        self.pushButton.clicked.connect(self.read_input)
+        self.pushButton.clicked.connect(self.prediction)
 
     def read_input(self):
         userInput = dict()
@@ -2500,7 +2501,6 @@ class Ui_MainWindow(object):
                 userInput['FUEL'] = 'بنزینی'
             elif self.radioButton_7.isChecked():
                 userInput['FUEL'] = 'دوگانه سوز'
-            print(userInput)
 
         except:
             context = 'There is a problem with the input data. Please make sure the information is in correct format and try again.'
@@ -2512,6 +2512,15 @@ class Ui_MainWindow(object):
 
         finally:
             return userInput
+
+    def prediction(self):
+        data = self.read_input()
+        data = [data['COLOR'], data['KM_RUNNING'], data['FUEL'],
+                data['GEAR'], data['YEAR'], data['MODEL'], data['BODY_CONDITION']]
+
+        price = Car_Price_Predict.regression_preparation(data)
+        price = "{:,}".format(price)
+        self.label_12.setText(price)
 
 
 if __name__ == "__main__":
