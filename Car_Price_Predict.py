@@ -1,6 +1,11 @@
 import Spider
 import Storage
+import Foreteller
 
-data = Spider.scraper()
-data = Storage.preProcess(data)
-Storage.save(data)
+
+def regression_preparation(Y: list):
+    data = Spider.scraper()
+    data = Storage.preProcess(data)
+    Storage.save(data)
+    price = Foreteller.predict(Y)
+    return price
